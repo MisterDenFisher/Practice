@@ -40,5 +40,5 @@ void FakeCoinSearch();
 
 
 
-bool Transfer(ArrData*);
+int Transfer(ArrData*);
 //void AnalyzeFile(int, int, vector<int>&, string filename = "NN");

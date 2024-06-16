@@ -82,15 +82,14 @@ void SearchMethods()
 void BarrierSearch()
 {
 	ArrData* massive = new ArrData;
-	if (!Transfer(massive))
-		return;
-		
+	int dataType = Transfer(massive);
 
-	cout << "BS1";
-	int x;
-	cin >> x;
+	if (dataType == -1)
+		return;
 	
 
+
+	delete(massive);
 }
 
 void BinarySearch()
@@ -112,7 +111,7 @@ void GenerationFiles()
 	cout << "\nСоздание файлов\n";
 	cout << "Примечание: в зависимости от выбора метода создания у файлов в названии будут разные приписки:\n - [GF] (Сгенерированный файл)\n - [UF] (Пользовательский файл)\n";
 
-	vector<string> dataType{ "Целые числа", "Вещественные числа", "Символы", "Слова" };
+	vector<string> dataType{ "Целые числа", "Вещественные числа", "Символы", "Слова", "Фальшивая монета"};
 	vector<string> createFile{ "Сгенерировать файл", "Пользовательский файл", "НАЗАД" };
 
 	PrintMessage(createFile.size(), createFile);
@@ -123,7 +122,7 @@ void GenerationFiles()
 			cout << "> Сколько файлов сгенерировать? ";
 			int count = InputInt();
 
-			cout << "> Тип данных в файле(-ах)\n";
+			cout << "> Тип генерации\n";
 			PrintMessage(dataType.size(), dataType);
 			int choice = InputAnswer(dataType.size());
 

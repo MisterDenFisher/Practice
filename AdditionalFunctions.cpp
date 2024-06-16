@@ -107,7 +107,7 @@ void FileGenerator(int count, int dataType)
 	string filename;
 	int _language = 1;
 
-	if (dataType >= 3) {
+	if (dataType == 3 || dataType == 4) {
 		vector<string> language{ "Кириллица", "Латиница" };
 		cout << "> При генерации файла(-ов) использовать латиницу?\n";
 		PrintMessage(language.size(), language);
@@ -198,6 +198,73 @@ void GenerateOneFile(ofstream& fout, int dataType, int _language)
 				}
 				break;
 			}
+			break;
+		}
+		case 5:
+		{
+			fout << "FakeCoin" << endl;
+
+			int typeGen = rand() % 3 + 1;
+
+			switch (typeGen) {
+				case 1:
+				{
+					int numb = rand() % 10;
+					int FakeCoin = rand() % 10;
+					while (numb == FakeCoin)
+						FakeCoin = rand() % 10;
+
+					int posFakeCoin = rand() % countNumb;
+					int i;
+					for (i = 0; i < posFakeCoin - 1; i++)
+						fout << numb << ' ';
+					fout << FakeCoin << ' ';
+					for (i = posFakeCoin; i < countNumb; i++)
+						fout << numb << ' ';
+					break;
+				}
+
+				case 2:
+				{
+					int _charCode = rand() % 64 + 192;
+					int FakeCoinCode = rand() % 64 + 192;
+					while (_charCode == FakeCoinCode)
+						FakeCoinCode = rand() % 64 + 192;
+
+					char _char = static_cast<char>(_charCode);
+					char FakeCoin = static_cast<char>(FakeCoinCode);
+
+					int posFakeCoin = rand() % countNumb;
+					int i;
+					for (i = 0; i < posFakeCoin - 1; i++)
+						fout << _char << ' ';
+					fout << FakeCoin << ' ';
+					for (i = posFakeCoin; i < countNumb; i++)
+						fout << _char << ' ';
+					break;
+				}
+
+				case 3:
+				{
+					int _charCode = (rand() % 26 + 65) + (rand() % 2 * 32);
+					int FakeCoinCode = (rand() % 26 + 65) + (rand() % 2 * 32);
+					while (_charCode == FakeCoinCode)
+						FakeCoinCode = (rand() % 26 + 65) + (rand() % 2 * 32);
+
+					char _char = static_cast<char>(_charCode);
+					char FakeCoin = static_cast<char>(FakeCoinCode);
+
+					int posFakeCoin = rand() % countNumb;
+					int i;
+					for (i = 0; i < posFakeCoin - 1; i++)
+						fout << _char << ' ';
+					fout << FakeCoin << ' ';
+					for (i = posFakeCoin; i < countNumb; i++)
+						fout << _char << ' ';
+					break;
+				}
+			}
+			break;
 		}
 	}
 }
@@ -237,51 +304,133 @@ void CreateUserFile(ofstream& fout, int choice)
 	fout.close();
 }
 
-bool Transfer(ArrData* massive)
+int Transfer(ArrData* massive)
 {
 	string filename;
+	bool userFile = false;
 
+	cout << "Примечание: при вводе названия файла его расширение (.txt) указывать не нужно\n";
 	cout << "Введите имя файла, где производить поиск: ";
 	getline(cin, filename);
+
+	if (filename[filename.size() - 3] == 'U')
+		userFile = true;
+	filename += ".txt";
 	int attempt = 1;
 
 	ifstream fin(filename);
-	
+
 	while (!fin.good()) {
 		cout << "Файла с указанным названием не существует! Повторите попытку: ";
 		getline(cin, filename);
 		ifstream fin(filename);
 		if (attempt == 2)
-			return false;
+			return -1;
 		++attempt;
 	}
-	
+
 	string dataType;
 	string data;
-	string oneElem;
+	string elem;
 
 	getline(fin, dataType);
 	getline(fin, data);
 
-	if (dataType == "Int"){
-		int number;
-		for (int i = 0; i < data.length(); i++) {
-			if (data[i] != ' ')
-				oneElem += data[i];
-			else {
-
-			}
+	if (dataType == "Int") {
+		if (!userFile)
+			for (int i = 0; i < data.length(); i++)
+				if (data[i] != ' ')
+					elem += data[i];
+				else {
+					massive->intArr.push_back(stoi(elem));
+					elem = "";
+				}
+		else {
+			int number;
+			size_t pos;
+			for (int i = 0; i < data.length(); i++)
+				if (data[i] != ' ')
+					elem += data[i];
+				else {
+					try {
+						number = stoi(elem, &pos);
+						if (pos != elem.length()) {
+							cout << "Файл содержит элементы, не соответствующие изначальному типу данных!!!\n";
+							return -1;
+						}
+						massive->intArr.push_back(number);
+						elem = "";
+					}
+					catch (const invalid_argument& e) {
+						cerr << "Файл содержит элементы, не соответствующие изначальному типу данных!!!\n";
+						return -1;
+					}
+					
+				}
 		}
+			
+		for (int i = 0; i < massive->intArr.size(); i++)
+			cout << massive->intArr[i] << ' ';
+		cout << endl;
+		return 1;
 	}
 	else if (dataType == "Real") {
+		if (!userFile)
+			for (int i = 0; i < data.length(); i++)
+				if (data[i] != ' ')
+					elem += data[i];
+				else {
+					massive->floatArr.push_back(stof(elem));
+					elem = "";
+				}
+		else {
+			float number;
+			size_t pos;
+			for (int i = 0; i < data.length(); i++)
+				if (data[i] != ' ')
+					elem += data[i];
+				else {
+					try {
+						number = stof(elem, &pos);
+						if (pos != elem.length()) {
+							cout << "Файл содержит элементы, не соответствующие изначальному типу данных!!!\n";
+							return -1;
+						}
+						massive->floatArr.push_back(number);
+						elem = "";
+					}
+					catch (const invalid_argument& e) {
+						cerr << "Файл содержит элементы, не соответствующие изначальному типу данных!!!\n";
+						return -1;
+					}
 
+				}
+		}
+		for (int i = 0; i < massive->floatArr.size(); i++)
+			cout << massive->floatArr[i] << ' ';
+		cout << endl;
+		return 2;
 	}
-	else if (dataType == "Char") {
-
+	else if (dataType == "Char" || dataType == "FakeCoin") {
+		for (int i = 0; i < data.length(); i++)
+			if (data[i] != ' ')
+				massive->charArr.push_back(data[i]);
+		for (int i = 0; i < massive->charArr.size(); i++)
+			cout << massive->charArr[i] << ' ';
+		cout << endl;
+		return 3;
 	}
-	else {
-
+	else if (dataType == "String") {
+		for (int i = 0; i < data.length(); i++)
+			if (data[i] != ' ')
+				elem += data[i];
+			else {
+				massive->stringArr.push_back(elem);
+				elem = "";
+			}
+		for (int i = 0; i < massive->stringArr.size(); i++)
+			cout << massive->stringArr[i] << ' ';
+		cout << endl;
+		return 4;
 	}
-	return true;
-
 }
