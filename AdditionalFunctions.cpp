@@ -25,13 +25,64 @@ int InputInt()
 		}
 		bool cycle = false;
 		for (int i = 0; i < input.length(); i++) {
-			if (input[i] < 48 || input[i] > 57) {
+			if ((input[i] < 48 || input[i] > 57) && (input[i] != 45)) {
 				cout << "Строка должна содержать только цифры! Повторите попытку: ";
 				cycle = true;
 				break;
 			}
 		}
 		if (!cycle) return stoi(input);
+	}
+}
+
+float InputFloat()
+{
+	string input;
+	while (true) {
+		getline(cin, input);
+		if (input[0] == '\n' || input[0] == '\0' || input[0] == ' ') {
+			cout << "Строка не должна быть пустой! Повторите попытку: ";
+			continue;
+		}
+		bool cycle = false;
+		for (int i = 0; i < input.length(); i++) {
+			if ((input[i] < 48 || input[i] > 57) && (input[i] != 45) && (input[i] != 46)) {
+				cout << "Строка должна содержать только цифры! Повторите попытку: ";
+				cycle = true;
+				break;
+			}
+		}
+		if (!cycle) return stof(input);
+	}
+}
+
+char InputChar()
+{
+	string input;
+	while (true) {
+		getline(cin, input);
+		if (input[0] == '\n' || input[0] == '\0' || input[0] == ' ') {
+			cout << "Строка не должна быть пустой! Повторите попытку: ";
+			continue;
+		}
+		if (input.length() != 1)
+			cout << "Введите только одну букву! Повторите попытку: ";
+		else
+			return input[0];
+	}
+}
+
+string InputString()
+{
+	string input;
+	while (true) {
+		getline(cin, input);
+		if (input[0] == '\n' || input[0] == '\0' || input[0] == ' ') {
+			cout << "Строка не должна быть пустой! Повторите попытку: ";
+			continue;
+		}
+		else
+			return input;
 	}
 }
 
@@ -94,7 +145,7 @@ string InputFilename()
 			return input;
 		}
 		else {
-			cout << "Недопустимые символы для имени файла. Повторите попытку: ";
+			cout << "Недопустимые символы в имени файла. Повторите попытку: ";
 			fout.close();
 			fin.close();
 			continue;
@@ -312,23 +363,17 @@ int Transfer(ArrData* massive)
 	cout << "Примечание: при вводе названия файла его расширение (.txt) указывать не нужно\n";
 	cout << "Введите имя файла, где производить поиск: ";
 	getline(cin, filename);
-
-	if (filename[filename.size() - 3] == 'U')
-		userFile = true;
 	filename += ".txt";
-	int attempt = 1;
-
-	ifstream fin(filename);
-
-	while (!fin.good()) {
+	while (!fs::exists(filename)) {
 		cout << "Файла с указанным названием не существует! Повторите попытку: ";
 		getline(cin, filename);
-		ifstream fin(filename);
-		if (attempt == 2)
-			return -1;
-		++attempt;
+		filename += ".txt";
 	}
+	ifstream fin(filename);
 
+	if (filename[filename.size() - 7] == 'U')
+		userFile = true;
+	
 	string dataType;
 	string data;
 	string elem;
@@ -368,13 +413,9 @@ int Transfer(ArrData* massive)
 					
 				}
 		}
-			
-		for (int i = 0; i < massive->intArr.size(); i++)
-			cout << massive->intArr[i] << ' ';
-		cout << endl;
 		return 1;
 	}
-	else if (dataType == "Real") {
+	else if (dataType == "Float") {
 		if (!userFile)
 			for (int i = 0; i < data.length(); i++)
 				if (data[i] != ' ')
@@ -406,21 +447,18 @@ int Transfer(ArrData* massive)
 
 				}
 		}
-		for (int i = 0; i < massive->floatArr.size(); i++)
-			cout << massive->floatArr[i] << ' ';
-		cout << endl;
 		return 2;
 	}
 	else if (dataType == "Char" || dataType == "FakeCoin") {
 		for (int i = 0; i < data.length(); i++)
 			if (data[i] != ' ')
 				massive->charArr.push_back(data[i]);
-		for (int i = 0; i < massive->charArr.size(); i++)
-			cout << massive->charArr[i] << ' ';
-		cout << endl;
-		return 3;
+		if (dataType == "Char")
+			return 3;
+		else
+			return 5;
 	}
-	else if (dataType == "String") {
+	else {
 		for (int i = 0; i < data.length(); i++)
 			if (data[i] != ' ')
 				elem += data[i];
@@ -428,9 +466,236 @@ int Transfer(ArrData* massive)
 				massive->stringArr.push_back(elem);
 				elem = "";
 			}
-		for (int i = 0; i < massive->stringArr.size(); i++)
-			cout << massive->stringArr[i] << ' ';
-		cout << endl;
 		return 4;
 	}
+}
+
+bool BaS_AnalyzeFile(ArrData* massive, int typeData)
+{
+	vector<string> closeQuestion{ "Нет", "Да" };
+	cout << "Содержание файла ";
+	bool _continue;
+
+	switch (typeData) {
+	case 1:
+		BaS_PrintMassive(massive->intArr);
+		do {
+			cout << "\n> Какое число вы хотите найти в данном файле?	";
+			int x = InputInt();
+			_continue = BaS_Cycle(massive->intArr, x);
+
+		} while (_continue);
+		break;
+
+	case 2:
+		BaS_PrintMassive(massive->floatArr);
+		do {
+			cout << "\n> Какое число вы хотите найти в данном файле?	";
+			float x = InputFloat();
+			_continue = BaS_Cycle(massive->floatArr, x);
+
+		} while (_continue);
+		break;
+	case 3:
+		BaS_PrintMassive(massive->charArr);
+		do {
+			cout << "\n> Какую букву вы хотите найти в данном файле?	";
+			char x = InputChar();
+			_continue = BaS_Cycle(massive->charArr, x);
+		} while (_continue);
+		break;
+	case 4:
+		BaS_PrintMassive(massive->stringArr);
+		do {
+			cout << "\n> Какое слово вы хотите найти в данном файле?	";
+			string x = InputString();
+			_continue = BaS_Cycle(massive->stringArr, x);
+
+		} while (_continue);
+		break;
+	}
+	cout << "Продолжить работать с этим методом поиска?\n";
+	PrintMessage(closeQuestion.size(), closeQuestion);
+	int answer = InputAnswer(closeQuestion.size());
+	if (answer == 0)
+		return 0;
+	else
+		return 1;
+}
+
+bool BiS_AnalyzeFile(ArrData* massive, int typeData)
+{
+	vector<string> closeQuestion{ "Нет", "Да" };
+	bool _continue;
+
+	switch (typeData) {
+	case 1:
+		BiS_Sorting(massive->intArr);
+		do {
+			cout << "\n> Какое число вы хотите найти в данном файле?	";
+			int x = InputInt();
+			_continue = BiS_Cycle(massive->intArr, x);
+
+		} while (_continue);
+		break;
+
+	case 2:
+		BiS_Sorting(massive->floatArr);
+		do {
+			cout << "\n> Какое число вы хотите найти в данном файле?	";
+			float x = InputFloat();
+			_continue = BiS_Cycle(massive->floatArr, x);
+
+		} while (_continue);
+		break;
+	case 3:
+		BiS_Sorting(massive->charArr);
+		do {
+			cout << "\n> Какое число вы хотите найти в данном файле?	";
+			char x = InputChar();
+			_continue = BaS_Cycle(massive->charArr, x);
+		} while (_continue);
+		break;
+	case 4:
+		BiS_Sorting(massive->stringArr);
+		do {
+			cout << "\n> Какое число вы хотите найти в данном файле?	";
+			string x = InputString();
+			_continue = BaS_Cycle(massive->stringArr, x);
+
+		} while (_continue);
+		break;
+	}
+	cout << "Продолжить работать с этим методом поиска?\n";
+	PrintMessage(closeQuestion.size(), closeQuestion);
+	int answer = InputAnswer(closeQuestion.size());
+	if (answer == 0)
+		return 0;
+	else
+		return 1;
+}
+
+template <typename T> void BiS_Sorting(vector<T>& massive)
+{
+	cout << "Изначальное содержание файла\n";
+	for (int i = 0; i < massive.size(); i++)
+		cout << massive[i] << ' ';
+	cout << endl;
+
+	T temp;
+	for (int i = 0; i < massive.size() - 1; i++)
+		for (int j = i + 1; j > 0; j--)
+			if (massive[j] < massive[j - 1]) {
+				temp = massive[j];
+				massive[j] = massive[j - 1];
+				massive[j - 1] = temp;
+			}
+			else
+				break;
+
+	printf("Файл после сортировки (количество элементов: %d):\n", massive.size());
+	for (int i = 0; i < massive.size(); i++)
+		cout << massive[i] << ' ';
+	cout << endl;
+}
+
+template <typename T> bool BiS_Cycle(vector<T>& massive, T x)
+{
+	vector<string> closeQuestion{ "Нет", "Да" };
+	int k = massive.size() / 2;
+	cout << "Позиция искомого элемента: ";
+	while (true) {
+		if (massive[k] == x) {
+			cout << k + 1;
+			break;
+		}
+		else if (massive[k] < x)
+			k = (massive.size() + k) / 2;
+		else
+			k = k / 2;
+	}
+	while (true) {
+		if (massive[k - 1] == massive[k])
+			k--;
+		else
+			break;
+	}
+	while (massive[k] == x) {
+		cout << k + 1 << ' ';
+		k++;
+	}
+
+	cout << "\nХотите ли вы продолжить поиск в текущем файле?\n";
+	PrintMessage(closeQuestion.size(), closeQuestion);
+	int answer = InputAnswer(closeQuestion.size());
+	closeQuestion.shrink_to_fit();
+	closeQuestion.clear();
+
+	if (answer == 0) {
+		massive.shrink_to_fit();
+		massive.clear();
+		return 0;
+	}
+	else
+		return 1;
+}
+
+template <typename T> void BaS_PrintMassive(const vector<T>& massive)
+{
+	printf("(количество элементов: %d):\n", massive.size());
+	for (int i = 0; i < massive.size(); i++)
+		cout << massive[i] << ' ';
+	cout << endl;
+}
+
+template <typename T> bool BaS_Cycle(vector<T>& massive, T x)
+{
+	vector<string> closeQuestion{ "Нет", "Да" };
+	bool found;
+	bool last;
+
+	while (true) {
+		found = false;
+		last = false;
+
+		if (massive.back() == x)
+			last = true;
+
+		int i = 0;
+		massive.back() = x;
+		while (true) {
+			while (true) {
+				if (massive[i] == massive.back())
+					break;
+				i++;
+			}
+			if (i == massive.size() - 1)
+				break;
+			found = true;
+			cout << i + 1 << ' ';
+			i++;
+		}
+
+		if (last)
+			cout << massive.size();
+		else if (!found)
+			cout << "отсутствует!!!";
+		cout << endl;
+		break;
+	}
+
+
+	cout << "Хотите ли вы продолжить поиск в текущем файле?\n";
+	PrintMessage(closeQuestion.size(), closeQuestion);
+	int answer = InputAnswer(closeQuestion.size());
+	closeQuestion.shrink_to_fit();
+	closeQuestion.clear();
+
+	if (answer == 0) {
+		massive.shrink_to_fit();
+		massive.clear();
+		return 0;
+	}
+	else
+		return 1;
 }

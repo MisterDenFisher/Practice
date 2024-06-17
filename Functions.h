@@ -6,11 +6,13 @@
 #include <vector>
 #include <cstdio>
 #include <random>
+#include <filesystem>
 
 using namespace std;
+namespace fs = std::filesystem;
 
-const int maxRange = 1000;
-const int maxNumb = 100;
+const int maxRange = 50;
+const int maxNumb = 1000;
 
 struct ArrData {
 	vector<int> intArr;
@@ -36,9 +38,12 @@ void BarrierSearch();
 void BinarySearch();
 void FakeCoinSearch();
 
-
-
-
-
 int Transfer(ArrData*);
-//void AnalyzeFile(int, int, vector<int>&, string filename = "NN");
+bool BaS_AnalyzeFile(ArrData*, int);
+template <typename T> void BaS_PrintMassive(const vector<T>&);
+template <typename T> bool BaS_Cycle(vector<T>&, T);
+
+bool BiS_AnalyzeFile(ArrData*, int);
+template <typename T> void BiS_Sorting(vector<T>&);
+template void BiS_Sorting<int>(vector<int>&);
+template <typename T> bool BiS_Cycle(vector<T>&, T x);

@@ -53,50 +53,44 @@ void SearchMethods()
 	cout << endl;
 }
 
-//
-//void AnalyzeFile(int n, int x, vector<int>& massive, string filename)
-//{
-//	if (filename == "NN") 
-//		string filename = to_string(n) + " [Explored].txt";
-//	else
-//		filename += " [Explored].txt";
-//	ofstream fout(filename);
-//
-//	if (massive.back() == x) {
-//		fout << massive.back() << endl;
-//	}
-//	else {
-//		int i = 0;
-//		massive.back() = x;
-//		while (true) {
-//			if (massive[i] == massive.back()) {
-//				fout << "Позиция искомого числа: " << i + 1 <<endl;
-//				break;
-//			}
-//			i++;
-//		}
-//	}
-//	fout.close();
-//}
-//
 void BarrierSearch()
 {
 	ArrData* massive = new ArrData;
-	int dataType = Transfer(massive);
+	int dataType;
 
-	if (dataType == -1)
-		return;
-	
+	do {
+		dataType = Transfer(massive);
 
+		if (dataType == -1)
+			return;
+		else if (dataType == 5) {
+			cout << "Файл не подходит для данного метода!\n";
+			return;
+		}
+		
+	} while (BaS_AnalyzeFile(massive, dataType));
 
 	delete(massive);
 }
 
 void BinarySearch()
 {
-	cout << "BS2";
-	int x;
-	cin >> x;
+	ArrData* massive = new ArrData;
+	int dataType;
+
+	do {
+		dataType = Transfer(massive);
+
+		if (dataType == -1)
+			return;
+		else if (dataType == 5) {
+			cout << "Файл не подходит для данного метода!\n";
+			return;
+		}
+
+	} while (BiS_AnalyzeFile(massive, dataType));
+
+	delete(massive);
 }
 
 void FakeCoinSearch()
@@ -121,6 +115,10 @@ void GenerationFiles()
 		case 1:{
 			cout << "> Сколько файлов сгенерировать? ";
 			int count = InputInt();
+			while (count < 1) {
+				cout << "Число не может быть отрицательным или равняться 0. Повторите попытку: ";
+				count = InputInt();
+			}
 
 			cout << "> Тип генерации\n";
 			PrintMessage(dataType.size(), dataType);
