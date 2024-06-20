@@ -11,7 +11,8 @@
 using namespace std;
 namespace fs = std::filesystem;
 
-const int maxRange = 50;
+//Параметры генерации
+const int maxRange = 500;
 const int maxNumb = 1000;
 
 struct ArrData {
@@ -21,29 +22,47 @@ struct ArrData {
 	vector<string> stringArr;
 };
 
+//Основные функции
 void StartProgram();
-void SearchMethods();
 void GenerationFiles();
+void SearchMethods();
+void BarrierSearch();
+void BinarySearch();
+void FakeCoinSearch();
+void EndProgram();
+
+//Генерация файлов
 void FileGenerator(int, int);
 void GenerateOneFile(ofstream&, int, int);
 void CreateUserFile(ofstream&, int);
 
+//Вывод сообщений и массивов
 void PrintMessage(int, vector<string>);
+template <typename T> 
+void PrintMassive(const vector<T>&);
+
+//Ввод данных пользователем
 int InputInt();
+float InputFloat();
+char InputChar();
+string InputString();
 int InputAnswer(int);
 string InputFilename();
 
-
-void BarrierSearch();
-void BinarySearch();
-void FakeCoinSearch();
-
+//Чтение файла, запись данных в массив
 int Transfer(ArrData*);
-bool BaS_AnalyzeFile(ArrData*, int);
-template <typename T> void BaS_PrintMassive(const vector<T>&);
-template <typename T> bool BaS_Cycle(vector<T>&, T);
 
+//Поиск с барьером
+bool BaS_AnalyzeFile(ArrData*, int);
+template <typename T> 
+bool BaS_Cycle(vector<T>&, T);
+
+//Бинарный поиск
 bool BiS_AnalyzeFile(ArrData*, int);
-template <typename T> void BiS_Sorting(vector<T>&);
-template void BiS_Sorting<int>(vector<int>&);
-template <typename T> bool BiS_Cycle(vector<T>&, T x);
+template <typename T> int* BiS_Sorting(vector<T>&);
+template <typename T> bool BiS_Cycle(vector<T>&, int*, T x);
+
+//Фальшивая монета
+bool FakeCoin_AnalyzeFile(ArrData*);
+bool FakeCoin_CompHeap(vector<char>&, int);
+void FakeCoin_Cycle(vector<char>&);
